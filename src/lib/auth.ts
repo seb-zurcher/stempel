@@ -52,8 +52,18 @@ export async function exchangeCode(
   code: string,
 ): Promise<{ accessToken: string; refreshToken: string }> {
   if (!CLIENT_ID) throw new Error('VITE_GOOGLE_CLIENT_ID not set')
+
   const verifier = sessionStorage.getItem('pkce_verifier') ?? ''
   sessionStorage.removeItem('pkce_verifier')
+
+  // Diagnostic — visible in browser console if exchange fails
+  console.debug('[auth] exchangeCode', {
+    redirectUri: redirectUri(),
+    verifierLength: verifier.length,
+    codeLength: code.length,
+  })
+
+  if (!verifier) throw new Error('PKCE verifier missing from sessionStorage — did the OAuth tab change?')
 
   const res = await fetch(TOKEN_ENDPOINT, {
     method: 'POST',
@@ -70,8 +80,13 @@ export async function exchangeCode(
     access_token?: string
     refresh_token?: string
     error?: string
+    error_description?: string
   }
-  if (!data.access_token) throw new Error(data.error ?? 'Token exchange failed')
+  if (!data.access_token) {
+    const msg = [data.error, data.error_description].filter(Boolean).join(': ')
+    console.error('[auth] token exchange failed', data)
+    throw new Error(msg || 'Token exchange failed')
+  }
   return { accessToken: data.access_token, refreshToken: data.refresh_token ?? '' }
 }
 
