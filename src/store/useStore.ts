@@ -207,7 +207,7 @@ export const useStore = create<Store>((set, get) => ({
         entries,
         settings: { dailyTargetMinutes: settings.dailyTargetMinutes },
         lastModified: settings.lastSyncAt ?? new Date(0).toISOString(),
-        deletedIds: settings.deletedIds,
+        deletedIds: settings.deletedIds ?? [],
       }
 
       const merged = remote ? mergeSyncData(localData, remote) : localData
@@ -238,7 +238,7 @@ export const useStore = create<Store>((set, get) => ({
         entries,
         settings: { dailyTargetMinutes: settings.dailyTargetMinutes },
         lastModified: new Date().toISOString(),
-        deletedIds: settings.deletedIds,
+        deletedIds: settings.deletedIds ?? [],
       }
       await pushToDrive(accessToken, data)
       const updatedSettings = { ...settings, lastSyncAt: new Date().toISOString() }

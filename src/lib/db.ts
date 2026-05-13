@@ -121,7 +121,8 @@ export async function getSettings(): Promise<Settings> {
   const stored = await (await getDb()).get('settings', SETTINGS_KEY)
   if (!stored) return { ...DEFAULT_SETTINGS }
   const { id: _id, ...settings } = stored
-  return settings
+  // Merge with defaults so fields added in later versions are never undefined
+  return { ...DEFAULT_SETTINGS, ...settings }
 }
 
 export async function saveSettings(settings: Settings): Promise<void> {

@@ -69,7 +69,8 @@ export async function pushToDrive(token: string, data: SyncData): Promise<void> 
 
 // Per-entry updatedAt wins; deletedIds is the union of both sides.
 export function mergeSyncData(local: SyncData, remote: SyncData): SyncData {
-  const deletedIds = [...new Set([...local.deletedIds, ...remote.deletedIds])]
+  // Guard against older Drive files that predate the deletedIds field
+  const deletedIds = [...new Set([...(local.deletedIds ?? []), ...(remote.deletedIds ?? [])])]
 
   const localMap = new Map(local.entries.map((e) => [e.id, e]))
   const remoteMap = new Map(remote.entries.map((e) => [e.id, e]))
