@@ -7,7 +7,8 @@ const AUTH_ENDPOINT = 'https://accounts.google.com/o/oauth2/v2/auth'
 const TOKEN_ENDPOINT = 'https://oauth2.googleapis.com/token'
 
 function redirectUri(): string {
-  return window.location.origin + '/'
+  // BASE_URL is '/' in dev and '/stempel/' on GitHub Pages
+  return window.location.origin + import.meta.env.BASE_URL
 }
 
 function base64url(buf: ArrayBuffer): string {
