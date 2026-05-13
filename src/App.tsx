@@ -36,7 +36,10 @@ function AppShell() {
     oauthHandled.current = true
     const code = pendingOAuthCode
     pendingOAuthCode = null // consume so re-mounts don't retry
-    handleSyncCallback(code).then(() => navigate('/einstellungen'))
+    // Navigate first so the toast appears on Einstellungen, not Stempeluhr.
+    // handleSyncCallback fires syncNow() in background after token exchange.
+    navigate('/einstellungen')
+    handleSyncCallback(code)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Offline / back-online toasts

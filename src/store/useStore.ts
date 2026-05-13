@@ -183,7 +183,9 @@ export const useStore = create<Store>((set, get) => ({
       const updatedSettings = { ...get().settings, syncEnabled: true, googleRefreshToken: refreshToken }
       await db.saveSettings(updatedSettings)
       set({ accessToken, settings: updatedSettings })
-      await get().syncNow()
+      // Fire sync in background — caller navigates to Einstellungen first
+      // so the success toast appears there, not on Stempeluhr.
+      get().syncNow().catch(console.error)
     } catch (err) {
       set({
         syncStatus: 'error',
