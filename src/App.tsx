@@ -17,9 +17,13 @@ function AppShell() {
   const handleSyncCallback = useStore((s) => s.handleSyncCallback)
   const addToast = useToastStore((s) => s.addToast)
 
-  // Detect OAuth redirect back to the app
+  // Detect OAuth redirect back to the app.
+  // Use window.location.search (not loc.search) so that React StrictMode's
+  // double-invocation of effects in dev doesn't redeem the code twice:
+  // the first run clears the URL via replaceState; the second run sees an
+  // empty search string and exits early.
   useEffect(() => {
-    const params = new URLSearchParams(loc.search)
+    const params = new URLSearchParams(window.location.search)
     const code = params.get('code')
     if (!code) return
     window.history.replaceState({}, '', window.location.pathname)
