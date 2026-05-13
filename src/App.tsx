@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { BrowserRouter, Routes, Route, NavLink, Navigate, Link, useLocation, useNavigate } from 'react-router-dom'
 import Stempeluhr from './pages/Stempeluhr'
 import Rechner from './pages/Rechner'
@@ -10,6 +10,16 @@ import { useToastStore } from './store/useToastStore'
 import { strings } from './lib/strings.de'
 import { Settings } from 'lucide-react'
 
+// Capture the OAuth code at module level — before any React rendering.
+// The root <Navigate to="/stempeluhr"> fires during render and would strip
+// the ?code= query string before useEffect has a chance to read it.
+let pendingOAuthCode: string | null =
+  new URLSearchParams(window.location.search).get('code')
+if (pendingOAuthCode) {
+  // Clean the URL immediately so the router never sees the code params.
+  window.history.replaceState({}, '', window.location.pathname)
+}
+
 function AppShell() {
   const loc = useLocation()
   const navigate = useNavigate()
@@ -17,16 +27,15 @@ function AppShell() {
   const handleSyncCallback = useStore((s) => s.handleSyncCallback)
   const addToast = useToastStore((s) => s.addToast)
 
-  // Detect OAuth redirect back to the app.
-  // Use window.location.search (not loc.search) so that React StrictMode's
-  // double-invocation of effects in dev doesn't redeem the code twice:
-  // the first run clears the URL via replaceState; the second run sees an
-  // empty search string and exits early.
+  // Process the OAuth code captured at module level before routing ran.
+  // The ref prevents StrictMode's double-invocation from redeeming the
+  // same code twice (codes are single-use; second attempt → invalid_grant).
+  const oauthHandled = useRef(false)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const code = params.get('code')
-    if (!code) return
-    window.history.replaceState({}, '', window.location.pathname)
+    if (!pendingOAuthCode || oauthHandled.current) return
+    oauthHandled.current = true
+    const code = pendingOAuthCode
+    pendingOAuthCode = null // consume so re-mounts don't retry
     handleSyncCallback(code).then(() => navigate('/einstellungen'))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
