@@ -6,6 +6,9 @@ import type { SyncData } from '../lib/sync'
 import { nowLocalISO, todayISO } from '../lib/time'
 import { startOAuthFlow, exchangeCode, refreshAccessToken, revokeToken } from '../lib/auth'
 import { pullFromDrive, pushToDrive, mergeSyncData } from '../lib/sync'
+import { useToastStore } from './useToastStore'
+import { formatTime } from '../lib/time'
+import { strings } from '../lib/strings.de'
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -79,10 +82,11 @@ export const useStore = create<Store>((set, get) => ({
   async clockIn(note) {
     if (get().entries.some((e) => e.clockOut === null)) return
     const now = new Date().toISOString()
+    const clockInTime = nowLocalISO()
     const entry: TimeEntry = {
       id: crypto.randomUUID(),
       date: todayISO(),
-      clockIn: nowLocalISO(),
+      clockIn: clockInTime,
       clockOut: null,
       note,
       createdAt: now,
@@ -90,6 +94,7 @@ export const useStore = create<Store>((set, get) => ({
     }
     await db.addEntry(entry)
     set((s) => ({ entries: [...s.entries, entry] }))
+    useToastStore.getState().addToast(strings.toastClockedIn(formatTime(clockInTime)), 'info')
     schedulePush()
   },
 
@@ -214,11 +219,11 @@ export const useStore = create<Store>((set, get) => ({
       }
       await db.saveSettings(updatedSettings)
       set({ entries: merged.entries, settings: updatedSettings, syncStatus: 'idle' })
+      useToastStore.getState().addToast(strings.toastSyncSuccess, 'success')
     } catch (err) {
-      set({
-        syncStatus: 'error',
-        syncError: err instanceof Error ? err.message : 'Synchronisation fehlgeschlagen',
-      })
+      const msg = err instanceof Error ? err.message : 'Synchronisation fehlgeschlagen'
+      set({ syncStatus: 'error', syncError: msg })
+      useToastStore.getState().addToast(strings.toastSyncError, 'error')
     }
   },
 

@@ -29,7 +29,7 @@ export function ClockButton({ openEntry, onClock }: Props) {
     <div className="flex flex-col items-center gap-4">
       <button
         onClick={onClock}
-        className="w-full py-5 text-lg font-semibold tracking-wide rounded transition-colors active:opacity-90"
+        className="w-full py-5 text-lg font-semibold tracking-wide rounded transition-all active:scale-[0.97] active:brightness-90"
         style={{
           backgroundColor: isClocked ? 'var(--accent)' : '#166534',
           color: '#fff',

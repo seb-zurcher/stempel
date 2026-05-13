@@ -29,7 +29,7 @@ export function ForgottenClockOutBanner({ entry }: Props) {
 
   return (
     <div
-      className="rounded px-4 py-3 flex flex-col gap-3"
+      className="rounded px-4 py-3 flex flex-col gap-3 animate-fade-in"
       style={{
         backgroundColor: 'var(--surface)',
         borderLeft: '3px solid var(--accent)',

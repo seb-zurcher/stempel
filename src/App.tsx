@@ -4,7 +4,9 @@ import Stempeluhr from './pages/Stempeluhr'
 import Rechner from './pages/Rechner'
 import Einstellungen from './pages/Einstellungen'
 import { ThemeToggle } from './components/ThemeToggle'
+import { Toaster } from './components/Toaster'
 import { useStore } from './store/useStore'
+import { useToastStore } from './store/useToastStore'
 import { strings } from './lib/strings.de'
 import { Settings } from 'lucide-react'
 
@@ -13,6 +15,7 @@ function AppShell() {
   const navigate = useNavigate()
   const settingsActive = loc.pathname === '/einstellungen'
   const handleSyncCallback = useStore((s) => s.handleSyncCallback)
+  const addToast = useToastStore((s) => s.addToast)
 
   // Detect OAuth redirect back to the app
   useEffect(() => {
@@ -22,6 +25,13 @@ function AppShell() {
     window.history.replaceState({}, '', window.location.pathname)
     handleSyncCallback(code).then(() => navigate('/einstellungen'))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Offline / back-online toasts
+  useEffect(() => {
+    const onOffline = () => addToast(strings.toastOffline, 'info')
+    window.addEventListener('offline', onOffline)
+    return () => window.removeEventListener('offline', onOffline)
+  }, [addToast])
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
@@ -75,6 +85,8 @@ function AppShell() {
           <Route path="/einstellungen" element={<Einstellungen />} />
         </Routes>
       </main>
+
+      <Toaster />
     </div>
   )
 }

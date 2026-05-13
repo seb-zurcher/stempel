@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { startOfWeek, endOfWeek, startOfMonth, endOfMonth, format, parseISO } from 'date-fns'
-import { Download, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Clock, Download, Pencil, Plus, Trash2 } from 'lucide-react'
 import type { TimeEntry } from '../lib/db'
 import { entryDurationMinutes, formatMinutes, formatTime, todayISO } from '../lib/time'
 import { strings } from '../lib/strings.de'
@@ -167,9 +167,12 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
 
       {/* Empty state */}
       {groups.length === 0 && (
-        <p className="text-sm font-mono py-2" style={{ color: 'var(--muted)' }}>
-          Keine Einträge.
-        </p>
+        <div className="flex flex-col items-center gap-3 py-10 animate-fade-in">
+          <Clock size={28} style={{ color: 'var(--border)' }} />
+          <p className="text-sm font-mono" style={{ color: 'var(--muted)' }}>
+            Keine Einträge.
+          </p>
+        </div>
       )}
 
       {/* Date groups */}
