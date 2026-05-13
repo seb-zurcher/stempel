@@ -38,7 +38,7 @@ export function DailyProgress({ entries, targetMinutes }: Props) {
         {workedMinutes > 0 && (
           <span
             className="font-mono text-xs tabular-nums font-medium"
-            style={{ color: isOver ? '#166534' : 'var(--accent)' }}
+            style={{ color: isOver ? '#166534' : 'var(--destructive)' }}
           >
             {delta >= 0 ? '+' : '−'}
             {formatMinutes(Math.abs(delta))}
@@ -52,7 +52,7 @@ export function DailyProgress({ entries, targetMinutes }: Props) {
           className="h-full transition-all duration-1000"
           style={{
             width: `${ratio * 100}%`,
-            backgroundColor: isOver ? '#166534' : 'var(--accent)',
+            backgroundColor: isOver ? '#166534' : 'var(--destructive)',
           }}
         />
       </div>

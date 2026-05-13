@@ -1,7 +1,4 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <!-- Background: off-white -->
-  <rect width="1024" height="1024" fill="#F5F4EF"/>
-
   <!-- Coral ink mark -->
   <ellipse cx="512" cy="780" rx="280" ry="30" fill="#FF6B5B" opacity="0.95"/>
   <circle cx="220" cy="788" r="12" fill="#FF6B5B" opacity="0.85"/>
@@ -18,7 +15,7 @@
   <!-- Top plate -->
   <rect x="282" y="500" width="460" height="50" rx="6" fill="#1E2A4A"/>
 
-  <!-- Grip - light wood/cream -->
+  <!-- Grip -->
   <rect x="392" y="280" width="240" height="220" rx="20" fill="#EADFC8"/>
   <rect x="412" y="300" width="14" height="180" rx="6" fill="#F4ECDA" opacity="0.8"/>
   <rect x="592" y="300" width="18" height="180" rx="8" fill="#D4C5A0" opacity="0.5"/>

@@ -105,7 +105,7 @@ export default function Einstellungen() {
                 </span>
               )}
               {syncStatus === 'error' && (
-                <span style={{ color: 'var(--accent)' }}>
+                <span style={{ color: 'var(--destructive)' }}>
                   {strings.toastSyncError}: {syncError}
                 </span>
               )}
@@ -162,7 +162,7 @@ export default function Einstellungen() {
           />
         </div>
         {importError && (
-          <p className="mt-2 text-xs" style={{ color: 'var(--accent)' }}>{importError}</p>
+          <p className="mt-2 text-xs" style={{ color: 'var(--destructive)' }}>{importError}</p>
         )}
         {importDone && (
           <p className="mt-2 text-xs" style={{ color: '#166534' }}>{importDone}</p>

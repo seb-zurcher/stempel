@@ -3,8 +3,8 @@ import type { Toast } from '../store/useToastStore'
 
 const BG: Record<Toast['type'], string> = {
   success: '#166534',
-  error:   '#c73e3a',
-  info:    '#1e293b',
+  error:   '#FF6B5B',
+  info:    '#1E2A4A',
 }
 
 export function Toaster() {

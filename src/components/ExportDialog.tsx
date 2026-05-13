@@ -88,7 +88,7 @@ export function ExportDialog({ entries, targetMinutes, onClose }: Props) {
           ))}
         </div>
 
-        {error && <p className="text-xs" style={{ color: 'var(--accent)' }}>{error}</p>}
+        {error && <p className="text-xs" style={{ color: 'var(--destructive)' }}>{error}</p>}
       </div>
 
       <div className="flex gap-2 justify-end">

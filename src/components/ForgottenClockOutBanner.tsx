@@ -34,11 +34,11 @@ export function ForgottenClockOutBanner({ entry }: Props) {
         backgroundColor: 'var(--surface)',
         borderLeft: '3px solid var(--accent)',
         border: '1px solid var(--border)',
-        borderLeftColor: 'var(--accent)',
+        borderLeftColor: 'var(--destructive)',
       }}
     >
       <div className="flex items-start gap-2">
-        <AlertCircle size={15} className="shrink-0 mt-0.5" style={{ color: 'var(--accent)' }} />
+        <AlertCircle size={15} className="shrink-0 mt-0.5" style={{ color: 'var(--destructive)' }} />
         <p className="text-sm leading-snug">
           {strings.toastForgottenClockOut(formatDate(entry.date))}
         </p>

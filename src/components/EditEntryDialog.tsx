@@ -101,7 +101,7 @@ export function EditEntryDialog({ entry, onSave, onClose }: Props) {
         </label>
 
         {error && (
-          <p className="text-xs" style={{ color: 'var(--accent)' }}>{error}</p>
+          <p className="text-xs" style={{ color: 'var(--destructive)' }}>{error}</p>
         )}
       </div>
 

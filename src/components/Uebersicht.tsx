@@ -157,7 +157,7 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
           </span>
           <span
             className="font-mono text-xs tabular-nums font-medium"
-            style={{ color: aggDelta >= 0 ? '#166534' : 'var(--accent)' }}
+            style={{ color: aggDelta >= 0 ? '#166534' : 'var(--destructive)' }}
           >
             {aggDelta >= 0 ? '+' : '−'}
             {formatMinutes(Math.abs(aggDelta))}
@@ -199,7 +199,7 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
                 </span>
                 <span className="font-mono text-xs tabular-nums" style={{ color: 'var(--muted)' }}>
                   {formatMinutes(groupTotal)}{' '}
-                  <span style={{ color: groupDelta >= 0 ? '#166534' : 'var(--accent)' }}>
+                  <span style={{ color: groupDelta >= 0 ? '#166534' : 'var(--destructive)' }}>
                     {groupDelta >= 0 ? '+' : '−'}
                     {formatMinutes(Math.abs(groupDelta))}
                   </span>
@@ -257,7 +257,7 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
                         onClick={() => setDeletingId(entry.id)}
                         className="p-1 rounded opacity-40 hover:opacity-100 transition-opacity"
                         title={strings.delete}
-                        style={{ color: 'var(--accent)' }}
+                        style={{ color: 'var(--destructive)' }}
                       >
                         <Trash2 size={13} />
                       </button>
@@ -325,7 +325,7 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
                 setDeletingId(null)
               }}
               className="px-4 py-1.5 text-sm rounded font-medium text-white"
-              style={{ backgroundColor: 'var(--accent)' }}
+              style={{ backgroundColor: 'var(--destructive)' }}
             >
               {strings.delete}
             </button>

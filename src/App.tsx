@@ -36,10 +36,31 @@ function AppShell() {
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <header style={{ borderBottom: '1px solid var(--border)' }}>
-        <div className="max-w-2xl mx-auto px-4 pt-4 flex items-center justify-between">
-          <span className="font-semibold tracking-tight text-base" style={{ color: 'var(--accent)' }}>
-            Stempel
-          </span>
+        <div className="max-w-2xl mx-auto px-4 pt-5 flex items-center justify-between">
+          {/* Brand — stamp icon + name, animated on load */}
+          <div className="flex items-center gap-2.5 animate-stamp">
+            {/* logo.svg has no background rect — container provides themed bg */}
+            <div
+              className="w-9 h-9 rounded-md overflow-hidden shrink-0 flex items-center justify-center"
+              style={{
+                backgroundColor: 'var(--surface)',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
+              }}
+            >
+              <img
+                src="/icons/logo.svg"
+                alt=""
+                aria-hidden="true"
+                className="w-full h-full"
+              />
+            </div>
+            <span
+              className="font-mono font-bold tracking-[0.2em] text-base uppercase select-none"
+              style={{ color: 'var(--accent)' }}
+            >
+              Stempel
+            </span>
+          </div>
           <div className="flex items-center">
             <ThemeToggle />
             <Link

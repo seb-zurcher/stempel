@@ -131,7 +131,7 @@ export function exportPDF(
     head: [['Datum', 'Von', 'Bis', 'Dauer', 'Differenz (min)', 'Notiz']],
     body: rows.map((r) => [r.datum, r.von, r.bis, r.dauer, r.delta, r.notiz]),
     styles: { font: 'courier', fontSize: 8 },
-    headStyles: { fillColor: [199, 62, 58], textColor: 255 },
+    headStyles: { fillColor: [30, 42, 74], textColor: 255 },
     columnStyles: {
       0: { cellWidth: 24 },
       1: { cellWidth: 14 },
