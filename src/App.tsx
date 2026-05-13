@@ -41,11 +41,8 @@ function AppShell() {
           <div className="flex items-center gap-2.5 animate-stamp">
             {/* logo.svg has no background rect — container provides themed bg */}
             <div
-              className="w-9 h-9 rounded-md overflow-hidden shrink-0 flex items-center justify-center"
-              style={{
-                backgroundColor: 'var(--surface)',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.15)',
-              }}
+              className="w-9 h-9 rounded-md overflow-hidden shrink-0 flex items-center justify-center bg-[#ECEAE3] dark:bg-[#2C3B5A]"
+              style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
             >
               <img
                 src="/icons/logo.svg"
