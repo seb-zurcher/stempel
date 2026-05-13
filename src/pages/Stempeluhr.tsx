@@ -3,6 +3,7 @@ import { useStore } from '../store/useStore'
 import { ClockButton } from '../components/ClockButton'
 import { DailyProgress } from '../components/DailyProgress'
 import { Uebersicht } from '../components/Uebersicht'
+import { ForgottenClockOutBanner } from '../components/ForgottenClockOutBanner'
 import { todayISO, formatDate } from '../lib/time'
 import { strings } from '../lib/strings.de'
 
@@ -32,6 +33,9 @@ export default function Stempeluhr() {
   const todayEntries = entries.filter((e) => e.date === today)
   const targetMinutes = settings.dailyTargetMinutes
 
+  // Open entry from a previous day = forgotten clock-out
+  const forgottenEntry = openEntry && openEntry.date !== today ? openEntry : null
+
   // Note field: pre-filled from the open entry's note; cleared on clock-out
   const [note, setNote] = useState(openEntry?.note ?? '')
   useEffect(() => {
@@ -56,6 +60,9 @@ export default function Stempeluhr() {
 
   return (
     <div className="flex flex-col gap-6">
+      {/* Forgotten clock-out banner — shown above everything when open entry is from a prior day */}
+      {forgottenEntry && <ForgottenClockOutBanner entry={forgottenEntry} />}
+
       {/* 1. Clock button + live elapsed timer */}
       <ClockButton openEntry={openEntry} onClock={handleClock} />
 
