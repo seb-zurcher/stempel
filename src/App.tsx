@@ -61,7 +61,7 @@ function AppShell() {
               style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.15)' }}
             >
               <img
-                src="/icons/logo.svg"
+                src={`${import.meta.env.BASE_URL}icons/logo.svg`}
                 alt=""
                 aria-hidden="true"
                 className="w-full h-full"

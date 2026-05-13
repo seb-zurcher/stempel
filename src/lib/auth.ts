@@ -57,14 +57,6 @@ export async function exchangeCode(
   const verifier = sessionStorage.getItem('pkce_verifier') ?? ''
   sessionStorage.removeItem('pkce_verifier')
 
-  // Diagnostic — visible in browser console if exchange fails
-  // Visible in Safari too (debug is filtered; log is not)
-  console.log('[auth] exchangeCode', {
-    redirectUri: redirectUri(),
-    verifierLength: verifier.length,
-    codeLength: code.length,
-  })
-
   if (!verifier) throw new Error('PKCE verifier missing from sessionStorage — did the OAuth tab change?')
 
   const body: Record<string, string> = {
