@@ -31,7 +31,7 @@ export function ThemeToggle() {
       onClick={() => updateSettings({ theme: next })}
       aria-label={`${strings.theme}: ${LABELS[theme]}`}
       title={`${strings.theme}: ${LABELS[theme]}`}
-      className="p-2 rounded transition-opacity opacity-50 hover:opacity-100"
+      className="p-3 rounded transition-opacity opacity-50 hover:opacity-100"
     >
       <Icon size={16} />
     </button>

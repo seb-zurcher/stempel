@@ -110,7 +110,7 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
             <button
               key={v.key}
               onClick={() => setView(v.key)}
-              className="px-3 py-1 text-xs font-medium border-b-2 transition-colors"
+              className="px-4 py-2.5 text-xs font-medium border-b-2 transition-colors"
               style={{
                 borderBottomColor: view === v.key ? 'var(--accent)' : 'transparent',
                 color: view === v.key ? 'var(--accent)' : 'var(--muted)',
@@ -126,18 +126,18 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
       <div className="flex gap-2">
         <button
           onClick={() => setManualOpen(true)}
-          className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-opacity hover:opacity-80"
+          className="flex items-center gap-1.5 px-3 py-2.5 text-sm rounded transition-opacity hover:opacity-80"
           style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
         >
-          <Plus size={11} />
+          <Plus size={13} />
           {strings.manualEntry}
         </button>
         <button
           onClick={() => setExportOpen(true)}
-          className="flex items-center gap-1 px-2 py-1 text-xs rounded transition-opacity hover:opacity-80"
+          className="flex items-center gap-1.5 px-3 py-2.5 text-sm rounded transition-opacity hover:opacity-80"
           style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
         >
-          <Download size={11} />
+          <Download size={13} />
           {strings.export}
         </button>
       </div>
@@ -247,7 +247,7 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
                       {!isOpen && (
                         <button
                           onClick={() => setEditingEntry(entry)}
-                          className="p-1 rounded opacity-40 hover:opacity-100 transition-opacity"
+                          className="p-2.5 rounded opacity-40 hover:opacity-100 transition-opacity"
                           title={strings.edit}
                         >
                           <Pencil size={13} />
@@ -255,7 +255,7 @@ export function Uebersicht({ entries, targetMinutes }: Props) {
                       )}
                       <button
                         onClick={() => setDeletingId(entry.id)}
-                        className="p-1 rounded opacity-40 hover:opacity-100 transition-opacity"
+                        className="p-2.5 rounded opacity-40 hover:opacity-100 transition-opacity"
                         title={strings.delete}
                         style={{ color: 'var(--destructive)' }}
                       >

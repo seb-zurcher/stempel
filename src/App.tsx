@@ -80,7 +80,7 @@ function AppShell() {
               to="/einstellungen"
               aria-label={strings.settings}
               title={strings.settings}
-              className="p-2 rounded transition-opacity hover:opacity-100"
+              className="p-3 rounded transition-opacity hover:opacity-100"
               style={{ opacity: settingsActive ? 1 : 0.5 }}
             >
               <Settings size={16} />
@@ -94,7 +94,7 @@ function AppShell() {
               borderBottomColor: isActive ? 'var(--accent)' : 'transparent',
               color: isActive ? 'var(--accent)' : 'var(--muted)',
             })}
-            className="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+            className="px-4 py-3 text-sm font-medium border-b-2 transition-colors"
           >
             {strings.tab1}
           </NavLink>
@@ -104,7 +104,7 @@ function AppShell() {
               borderBottomColor: isActive ? 'var(--accent)' : 'transparent',
               color: isActive ? 'var(--accent)' : 'var(--muted)',
             })}
-            className="px-4 py-2 text-sm font-medium border-b-2 transition-colors"
+            className="px-4 py-3 text-sm font-medium border-b-2 transition-colors"
           >
             {strings.tab2}
           </NavLink>
