@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
-  <!-- Background: off-white -->
-  <rect width="1024" height="1024" fill="#F5F4EF"/>
+  <!-- Background: navy — looks correct in both light and dark mode on iOS -->
+  <rect width="1024" height="1024" fill="#1E2A4A"/>
 
   <!-- Coral ink mark -->
   <ellipse cx="512" cy="780" rx="280" ry="30" fill="#FF6B5B" opacity="0.95"/>
