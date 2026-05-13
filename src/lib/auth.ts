@@ -1,4 +1,5 @@
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const CLIENT_ID     = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const CLIENT_SECRET = import.meta.env.VITE_GOOGLE_CLIENT_SECRET
 
 export const hasClientId = !!CLIENT_ID
 
@@ -57,7 +58,8 @@ export async function exchangeCode(
   sessionStorage.removeItem('pkce_verifier')
 
   // Diagnostic — visible in browser console if exchange fails
-  console.debug('[auth] exchangeCode', {
+  // Visible in Safari too (debug is filtered; log is not)
+  console.log('[auth] exchangeCode', {
     redirectUri: redirectUri(),
     verifierLength: verifier.length,
     codeLength: code.length,
@@ -65,16 +67,20 @@ export async function exchangeCode(
 
   if (!verifier) throw new Error('PKCE verifier missing from sessionStorage — did the OAuth tab change?')
 
+  const body: Record<string, string> = {
+    client_id: CLIENT_ID,
+    redirect_uri: redirectUri(),
+    grant_type: 'authorization_code',
+    code,
+    code_verifier: verifier,
+  }
+  // Google requires client_secret for "Web application" OAuth clients
+  if (CLIENT_SECRET) body.client_secret = CLIENT_SECRET
+
   const res = await fetch(TOKEN_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      redirect_uri: redirectUri(),
-      grant_type: 'authorization_code',
-      code,
-      code_verifier: verifier,
-    }),
+    body: new URLSearchParams(body),
   })
   const data = (await res.json()) as {
     access_token?: string
@@ -92,14 +98,17 @@ export async function exchangeCode(
 
 export async function refreshAccessToken(refreshToken: string): Promise<string> {
   if (!CLIENT_ID) throw new Error('VITE_GOOGLE_CLIENT_ID not set')
+  const refreshBody: Record<string, string> = {
+    client_id: CLIENT_ID,
+    grant_type: 'refresh_token',
+    refresh_token: refreshToken,
+  }
+  if (CLIENT_SECRET) refreshBody.client_secret = CLIENT_SECRET
+
   const res = await fetch(TOKEN_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: CLIENT_ID,
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-    }),
+    body: new URLSearchParams(refreshBody),
   })
   const data = (await res.json()) as { access_token?: string; error?: string }
   if (!data.access_token) throw new Error(data.error ?? 'Refresh failed')
