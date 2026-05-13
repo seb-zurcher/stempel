@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react'
+import { CheckCircle2, CloudOff, Loader2 } from 'lucide-react'
 import { useStore } from '../store/useStore'
 import { Dialog } from '../components/Dialog'
 import { createStempelData, downloadStempelData, parseStempelData } from '../lib/json-data'
@@ -88,28 +89,41 @@ export default function Einstellungen() {
         )}
 
         {hasClientId && settings.syncEnabled && (
-          <div className="flex flex-col gap-3">
-            {/* Status line */}
-            <div className="text-sm" style={{ color: 'var(--muted)' }}>
-              {syncStatus === 'syncing' && <span>Wird synchronisiert…</span>}
-              {syncStatus === 'idle' && settings.lastSyncAt && (
-                <span>
-                  {strings.toastSyncSuccess} —{' '}
-                  <span className="font-mono">
-                    {new Date(settings.lastSyncAt).toLocaleTimeString('de-CH', {
-                      hour: '2-digit', minute: '2-digit',
-                    })}
-                    {', '}
-                    {formatDate(settings.lastSyncAt.slice(0, 10))}
-                  </span>
-                </span>
+          <div
+            className="flex flex-col gap-4 rounded p-4"
+            style={{ border: '1px solid var(--border)', backgroundColor: 'var(--surface)' }}
+          >
+            {/* Connection badge — always visible */}
+            <div className="flex items-center gap-2">
+              {syncStatus === 'syncing' ? (
+                <Loader2 size={15} className="animate-spin" style={{ color: 'var(--accent)' }} />
+              ) : syncStatus === 'error' ? (
+                <CloudOff size={15} style={{ color: 'var(--destructive)' }} />
+              ) : (
+                <CheckCircle2 size={15} style={{ color: '#166834' }} />
               )}
-              {syncStatus === 'error' && (
-                <span style={{ color: 'var(--destructive)' }}>
-                  {strings.toastSyncError}: {syncError}
-                </span>
-              )}
+              <span className="text-sm font-medium">
+                {syncStatus === 'syncing' && 'Wird synchronisiert…'}
+                {syncStatus === 'error'   && 'Synchronisation fehlgeschlagen'}
+                {syncStatus === 'idle'    && 'Verbunden mit Google Drive'}
+              </span>
             </div>
+
+            {/* Last sync timestamp or error detail */}
+            <p className="text-xs font-mono" style={{ color: 'var(--muted)' }}>
+              {syncStatus === 'error' && syncError}
+              {syncStatus !== 'error' && settings.lastSyncAt && (
+                <>
+                  Zuletzt:{' '}
+                  {new Date(settings.lastSyncAt).toLocaleTimeString('de-CH', {
+                    hour: '2-digit', minute: '2-digit',
+                  })}
+                  {', '}
+                  {formatDate(settings.lastSyncAt.slice(0, 10))}
+                </>
+              )}
+              {syncStatus !== 'error' && !settings.lastSyncAt && 'Noch nicht synchronisiert.'}
+            </p>
 
             {/* Actions */}
             <div className="flex gap-2">
