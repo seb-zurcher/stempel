@@ -79,13 +79,21 @@ export default function Einstellungen() {
         )}
 
         {hasClientId && !settings.syncEnabled && (
-          <button
-            onClick={() => enableSync()}
-            className={btnOutline}
-            style={{ border: '1px solid var(--border)', color: 'var(--fg)' }}
-          >
-            Synchronisation aktivieren →
-          </button>
+          <>
+            <button
+              onClick={() => enableSync()}
+              className={btnOutline}
+              style={{ border: '1px solid var(--border)', color: 'var(--fg)' }}
+            >
+              Synchronisation aktivieren →
+            </button>
+            {/* Show token-exchange errors that happen before syncEnabled is set */}
+            {syncStatus === 'error' && (
+              <p className="text-xs mt-2 font-mono" style={{ color: 'var(--destructive)' }}>
+                Fehler: {syncError}
+              </p>
+            )}
+          </>
         )}
 
         {hasClientId && settings.syncEnabled && (
