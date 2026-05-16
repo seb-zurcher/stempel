@@ -59,7 +59,7 @@ export function ManualEntryDialog({ onSave, onClose }: Props) {
 
         {/* Times */}
         <div className="flex gap-3">
-          <label className="flex flex-col gap-1 flex-1">
+          <label className="flex flex-col gap-1 flex-1 min-w-0">
             <span className="text-xs" style={{ color: 'var(--muted)' }}>Von</span>
             <input
               type="time"
@@ -69,7 +69,7 @@ export function ManualEntryDialog({ onSave, onClose }: Props) {
               style={inputStyle}
             />
           </label>
-          <label className="flex flex-col gap-1 flex-1">
+          <label className="flex flex-col gap-1 flex-1 min-w-0">
             <span className="text-xs" style={{ color: 'var(--muted)' }}>Bis</span>
             <input
               type="time"

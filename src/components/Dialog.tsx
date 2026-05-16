@@ -13,7 +13,7 @@ export function Dialog({ onClose, children }: Props) {
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded flex flex-col gap-4 p-5 animate-fade-in"
+        className="w-full max-w-sm rounded flex flex-col gap-4 p-5 animate-fade-in overflow-hidden"
         style={{ backgroundColor: 'var(--bg)', border: '1px solid var(--border)' }}
         onClick={(e) => e.stopPropagation()}
       >
