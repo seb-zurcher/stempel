@@ -10,9 +10,13 @@ input, select, textarea {
   min-width: 0;
 }
 
-/* Force date/time inputs to respect their container width on iOS */
+/* Strip native iOS chrome (calendar icon, time steppers) from date/time inputs.
+   The native picker still opens on tap — only the inline chrome is removed,
+   which was rendering in a separate compositor layer that bypassed overflow clipping. */
 input[type="date"],
 input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
   width: 100% !important;
   max-width: 100% !important;
 }
