@@ -61,8 +61,8 @@ export function EditEntryDialog({ entry, onSave, onClose }: Props) {
         </label>
 
         {/* Times */}
-        <div className="flex gap-3">
-          <label className="flex flex-col gap-1 flex-1 min-w-0">
+        <div className={entry.clockOut !== null ? 'grid grid-cols-2 gap-3' : ''}>
+          <label className="flex flex-col gap-1">
             <span className="text-xs" style={{ color: 'var(--muted)' }}>Von</span>
             <input
               type="time"
@@ -74,7 +74,7 @@ export function EditEntryDialog({ entry, onSave, onClose }: Props) {
           </label>
 
           {entry.clockOut !== null && (
-            <label className="flex flex-col gap-1 flex-1 min-w-0">
+            <label className="flex flex-col gap-1">
               <span className="text-xs" style={{ color: 'var(--muted)' }}>Bis</span>
               <input
                 type="time"
