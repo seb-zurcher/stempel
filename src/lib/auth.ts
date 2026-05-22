@@ -51,7 +51,7 @@ export async function startOAuthFlow(): Promise<void> {
 
 export async function exchangeCode(
   code: string,
-): Promise<{ accessToken: string; refreshToken: string }> {
+): Promise<{ accessToken: string; refreshToken: string; expiresAt: number }> {
   if (!CLIENT_ID) throw new Error('VITE_GOOGLE_CLIENT_ID not set')
 
   const verifier = sessionStorage.getItem('pkce_verifier') ?? ''
@@ -77,6 +77,7 @@ export async function exchangeCode(
   const data = (await res.json()) as {
     access_token?: string
     refresh_token?: string
+    expires_in?: number
     error?: string
     error_description?: string
   }
@@ -85,10 +86,13 @@ export async function exchangeCode(
     console.error('[auth] token exchange failed', data)
     throw new Error(msg || 'Token exchange failed')
   }
-  return { accessToken: data.access_token, refreshToken: data.refresh_token ?? '' }
+  const expiresAt = Date.now() + ((data.expires_in ?? 3600) - 60) * 1000
+  return { accessToken: data.access_token, refreshToken: data.refresh_token ?? '', expiresAt }
 }
 
-export async function refreshAccessToken(refreshToken: string): Promise<string> {
+export async function refreshAccessToken(
+  refreshToken: string,
+): Promise<{ accessToken: string; expiresAt: number }> {
   if (!CLIENT_ID) throw new Error('VITE_GOOGLE_CLIENT_ID not set')
   const refreshBody: Record<string, string> = {
     client_id: CLIENT_ID,
@@ -102,9 +106,10 @@ export async function refreshAccessToken(refreshToken: string): Promise<string> 
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams(refreshBody),
   })
-  const data = (await res.json()) as { access_token?: string; error?: string }
+  const data = (await res.json()) as { access_token?: string; expires_in?: number; error?: string }
   if (!data.access_token) throw new Error(data.error ?? 'Refresh failed')
-  return data.access_token
+  const expiresAt = Date.now() + ((data.expires_in ?? 3600) - 60) * 1000
+  return { accessToken: data.access_token, expiresAt }
 }
 
 export async function revokeToken(token: string): Promise<void> {

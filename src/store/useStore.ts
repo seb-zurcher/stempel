@@ -19,9 +19,11 @@ interface Store {
 
   // Sync state (in memory only — not persisted)
   accessToken: string | null
+  tokenExpiresAt: number | null
   syncStatus: 'idle' | 'syncing' | 'error'
   syncError: string | null
 
+  getValidAccessToken: () => Promise<string | null>
   init: () => Promise<void>
   clockIn: (note: string) => Promise<void>
   clockOut: (note: string) => Promise<void>
@@ -37,6 +39,11 @@ interface Store {
   performPush: () => Promise<void>
   signOut: () => Promise<void>
 }
+
+// ── Retry guards (prevent infinite 401 loops) ──────────────────────────────
+
+let _syncRetry = false
+let _pushRetry = false
 
 // ── Debounced push ─────────────────────────────────────────────────────────
 
@@ -57,23 +64,34 @@ export const useStore = create<Store>((set, get) => ({
   settings: db.DEFAULT_SETTINGS,
   isLoaded: false,
   accessToken: null,
+  tokenExpiresAt: null,
   syncStatus: 'idle',
   syncError: null,
+
+  async getValidAccessToken() {
+    const { accessToken, tokenExpiresAt, settings } = get()
+    if (!settings.syncEnabled || !settings.googleRefreshToken) return null
+    // Refresh if: no token, expiry unknown, or expiry within 5 minutes
+    const needsRefresh = !accessToken || !tokenExpiresAt || Date.now() > tokenExpiresAt - 5 * 60 * 1000
+    if (!needsRefresh) return accessToken
+    try {
+      const { accessToken: newToken, expiresAt } = await refreshAccessToken(settings.googleRefreshToken)
+      set({ accessToken: newToken, tokenExpiresAt: expiresAt })
+      return newToken
+    } catch {
+      set({ syncStatus: 'error', syncError: 'Sitzung abgelaufen. Bitte neu anmelden.' })
+      return null
+    }
+  },
 
   async init() {
     if (get().isLoaded) return
     const [entries, settings] = await Promise.all([db.getAllEntries(), db.getSettings()])
     set({ entries, settings, isLoaded: true })
 
-    // Refresh access token and kick off initial sync if enabled
+    // Kick off initial sync if enabled — getValidAccessToken handles the refresh
     if (settings.syncEnabled && settings.googleRefreshToken) {
-      try {
-        const accessToken = await refreshAccessToken(settings.googleRefreshToken)
-        set({ accessToken })
-        get().syncNow().catch(console.error)
-      } catch {
-        set({ syncStatus: 'error', syncError: 'Sitzung abgelaufen. Bitte neu anmelden.' })
-      }
+      get().syncNow().catch(console.error)
     }
   },
 
@@ -179,10 +197,10 @@ export const useStore = create<Store>((set, get) => ({
   async handleSyncCallback(code) {
     set({ syncStatus: 'syncing', syncError: null })
     try {
-      const { accessToken, refreshToken } = await exchangeCode(code)
+      const { accessToken, refreshToken, expiresAt } = await exchangeCode(code)
       const updatedSettings = { ...get().settings, syncEnabled: true, googleRefreshToken: refreshToken }
       await db.saveSettings(updatedSettings)
-      set({ accessToken, settings: updatedSettings })
+      set({ accessToken, tokenExpiresAt: expiresAt, settings: updatedSettings })
       // Fire sync in background — caller navigates to Einstellungen first
       // so the success toast appears there, not on Stempeluhr.
       get().syncNow().catch(console.error)
@@ -195,12 +213,15 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   async syncNow() {
-    const { accessToken, settings, entries } = get()
-    if (!accessToken || !settings.syncEnabled) return
+    const { settings, entries } = get()
+    if (!settings.syncEnabled) return
+
+    const token = await get().getValidAccessToken()
+    if (!token) return
 
     set({ syncStatus: 'syncing', syncError: null })
     try {
-      const remote = await pullFromDrive(accessToken)
+      const remote = await pullFromDrive(token)
 
       const localData: SyncData = {
         version: 1,
@@ -212,17 +233,26 @@ export const useStore = create<Store>((set, get) => ({
 
       const merged = remote ? mergeSyncData(localData, remote) : localData
       await db.replaceAllEntries(merged.entries)
-      await pushToDrive(accessToken, merged)
+      await pushToDrive(token, merged)
 
       const updatedSettings = {
-        ...settings,
+        ...get().settings,
         lastSyncAt: new Date().toISOString(),
         deletedIds: merged.deletedIds,
       }
       await db.saveSettings(updatedSettings)
       set({ entries: merged.entries, settings: updatedSettings, syncStatus: 'idle' })
       useToastStore.getState().addToast(strings.toastSyncSuccess, 'success')
+      _syncRetry = false
     } catch (err) {
+      const is401 = err instanceof Error && err.message.includes('401')
+      if (is401 && !_syncRetry) {
+        _syncRetry = true
+        set({ tokenExpiresAt: null }) // force re-refresh on retry
+        get().syncNow().catch(console.error)
+        return
+      }
+      _syncRetry = false
       const msg = err instanceof Error ? err.message : 'Synchronisation fehlgeschlagen'
       set({ syncStatus: 'error', syncError: msg })
       useToastStore.getState().addToast(strings.toastSyncError, 'error')
@@ -230,8 +260,12 @@ export const useStore = create<Store>((set, get) => ({
   },
 
   async performPush() {
-    const { accessToken, settings, entries } = get()
-    if (!accessToken || !settings.syncEnabled) return
+    const { settings, entries } = get()
+    if (!settings.syncEnabled) return
+
+    const token = await get().getValidAccessToken()
+    if (!token) return
+
     try {
       const data: SyncData = {
         version: 1,
@@ -240,11 +274,20 @@ export const useStore = create<Store>((set, get) => ({
         lastModified: new Date().toISOString(),
         deletedIds: settings.deletedIds ?? [],
       }
-      await pushToDrive(accessToken, data)
-      const updatedSettings = { ...settings, lastSyncAt: new Date().toISOString() }
+      await pushToDrive(token, data)
+      const updatedSettings = { ...get().settings, lastSyncAt: new Date().toISOString() }
       await db.saveSettings(updatedSettings)
       set({ settings: updatedSettings })
+      _pushRetry = false
     } catch (err) {
+      const is401 = err instanceof Error && err.message.includes('401')
+      if (is401 && !_pushRetry) {
+        _pushRetry = true
+        set({ tokenExpiresAt: null }) // force re-refresh on retry
+        get().performPush().catch(console.error)
+        return
+      }
+      _pushRetry = false
       set({
         syncStatus: 'error',
         syncError: err instanceof Error ? err.message : 'Push fehlgeschlagen',
@@ -264,6 +307,6 @@ export const useStore = create<Store>((set, get) => ({
       lastSyncAt: null,
     }
     await db.saveSettings(updatedSettings)
-    set({ accessToken: null, settings: updatedSettings, syncStatus: 'idle', syncError: null })
+    set({ accessToken: null, tokenExpiresAt: null, settings: updatedSettings, syncStatus: 'idle', syncError: null })
   },
 }))
